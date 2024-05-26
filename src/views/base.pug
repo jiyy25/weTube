@@ -7,6 +7,16 @@ html(lang="ko")
         body
             header
                 h1=pageTitle
+                
+                nav
+                    ul
+                        if pageTitle == "home"
+                            li 
+                                a(href="/videos/upload") upload video
+                        else
+                            li 
+                                a(href="/") home
+
 
             main
                 block content
