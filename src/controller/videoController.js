@@ -5,9 +5,11 @@ export const handleHome = async (req, res) =>{
     return res.render("home",{pageTitle: "home", videos});
 }  //res.render("view") , express가 views 디렉토리에서 그 이름의 pug파일을 찾음, render는 퍼그파일의 이름을 전해주는 것
 
-export const watch = (req, res) => {
+export const watch = async(req, res) => {
     const { id } = req.params; //주소의 id값
-    return res.render("watch",{pageTitle: `Watching ${Video.title}`});
+    const video = await Video.findById(id); //mongoose가 부여한 id값을 사용할 수 있게함.
+    console.log(video);
+    return res.render("watch",{pageTitle: video.title ,video});
 } //base.pug에서 #{변수} => 각각의 컨트롤러에서 변수값을 보내 줄 수 있음
 
 export const getEdit = (req, res) =>{
@@ -28,15 +30,18 @@ export const getUploadVideo = (req, res) =>{
 
 export const postUploadVideo = async(req, res) => {
     const {title, description, createAt, hashtags, meta } = req.body;
-    await Video.create({
-        title,
-        description,
-        createAt : Date.now(),
-        hashtags: hashtags.split(",").map(hash=> `#${hash}`),
-        meta: {
-            views: 0,
-            rating: 0,
-        },
-    })
-    return res.redirect("/");
+    try{
+        await Video.create({
+            title,
+            description,
+            hashtags: hashtags.split(",").map(hash=> `#${hash}`),
+        })
+        return res.redirect("/");
+    } catch (error){
+        console.log(error);
+        return res.render("upload", {pageTitle: `upload video`, errorMessage :error._message});
+
+    }
+    //try, catch문으로 에러가 일어났을 때 업로드페이지로 보내줌, 에러메세지 보여줌.
+    
 };
