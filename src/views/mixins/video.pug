@@ -3,8 +3,9 @@ mixin video(info)
         a(href=`/videos/${info.id}`)=info.title
         ul
             li #{info.rating}/5.
-            li #{info.comments} comments.
-            li posted: #{info.createdAt}.
+            li #{info.title}.
+            li #{info.description} 
+            li posted: #{info.createAt}.
             li #{info.views} views
 
             //- 컨트롤러에서 보내준 videos가 info라는 인자로 들어와서 데이터를 뿌려줌. a태그로 이동해 줄 주소값에 id변수를 사용해 각 데이터를 하나씩 뿌려줌.
