@@ -9,18 +9,38 @@ export const watch = async(req, res) => {
     const { id } = req.params; //주소의 id값
     const video = await Video.findById(id); //mongoose가 부여한 id값을 사용할 수 있게함.
     console.log(video);
+    if(!video){
+        return res.render("404",{pageTitle: "Video not found."})
+    }
     return res.render("watch",{pageTitle: video.title ,video});
 } //base.pug에서 #{변수} => 각각의 컨트롤러에서 변수값을 보내 줄 수 있음
+//에러체크를 먼저한다.(!video)는(video === null)과 같은 의미
 
-export const getEdit = (req, res) =>{
+export const getEdit = async(req, res) =>{
     const { id } = req.params;
-    return res.render("edit",{pageTitle: `Edit ${Video.title}`});
+    const video = await Video.findById(id);
+    if(!video){
+        return res.render("404",{pageTitle: "Video not found."})
+    }
+    return res.render("edit",{pageTitle: `Edit ${video.title}`,video});
 } 
 
-export const postEdit = (req, res) =>{
+export const postEdit = async(req, res) =>{
     console.log(req.body);
     const { id } = req.params;
-    const { title } = req.body;
+    const { title, description, hashtags } = req.body;
+    const video = await Video.exists({_id:id}); //exists
+    if(!video){
+        return res.render("404",{pageTitle: "Video not found."})
+    }
+    await Video.findByIdAndUpdate(id,{
+        title,
+        description,
+        hashtags : hashtags.split(",").map((word)=> word.startsWith("#")? word :`#${word}`),
+        //hashtags의 경우 새롭게 저장하기 전 실행해야 하는 함수임. 이러한 단계를 처리하기 위한 미들웨어가 존재함.
+    })
+    //findByIdAndUpdate(id, 업데이트할 항목들) 찾아서 바로 업데이트 까지 처리 가능한 몽구스에서 제공하는 모델
+    await video.save();
     return res.redirect(`/videos/${id}`); //redirect:설정한 주소로 다시 보냄
 };
 
@@ -34,7 +54,8 @@ export const postUploadVideo = async(req, res) => {
         await Video.create({
             title,
             description,
-            hashtags: hashtags.split(",").map(hash=> `#${hash}`),
+            hashtags:  hashtags.split(",").map((word)=> word.startsWith("#")? word :`#${word}`),
+            //startsWith() 어떤 문자열이 특정 문자로 시작하는지 확인하여 결과를 true 혹은 false로 반환
         })
         return res.redirect("/");
     } catch (error){
