@@ -29,18 +29,19 @@ export const postEdit = async(req, res) =>{
     console.log(req.body);
     const { id } = req.params;
     const { title, description, hashtags } = req.body;
-    const video = await Video.exists({_id:id}); //exists
+    const video = await Video.exists({_id:id}); 
+    //Model.exists로 video object전체가 아닌 조건 유무를 true,false로 판단해서 검색할 수 있음
+
     if(!video){
         return res.render("404",{pageTitle: "Video not found."})
     }
     await Video.findByIdAndUpdate(id,{
         title,
         description,
-        hashtags : hashtags.split(",").map((word)=> word.startsWith("#")? word :`#${word}`),
-        //hashtags의 경우 새롭게 저장하기 전 실행해야 하는 함수임. 이러한 단계를 처리하기 위한 미들웨어가 존재함.
+        hashtags : Video.formatHashtags(hashtags),
     })
     //findByIdAndUpdate(id, 업데이트할 항목들) 찾아서 바로 업데이트 까지 처리 가능한 몽구스에서 제공하는 모델
-    await video.save();
+    // await video.save();
     return res.redirect(`/videos/${id}`); //redirect:설정한 주소로 다시 보냄
 };
 
@@ -49,13 +50,15 @@ export const getUploadVideo = (req, res) =>{
 };
 
 export const postUploadVideo = async(req, res) => {
-    const {title, description, createAt, hashtags, meta } = req.body;
+    const {title, description, hashtags} = req.body;
+    console.log("업로드 req.body::::::::",req.body)
     try{
         await Video.create({
             title,
             description,
-            hashtags:  hashtags.split(",").map((word)=> word.startsWith("#")? word :`#${word}`),
-            //startsWith() 어떤 문자열이 특정 문자로 시작하는지 확인하여 결과를 true 혹은 false로 반환
+            hashtags: Video.formatHashtags(hashtags),
+            // hashtags:  hashtags.split(",").map((word)=> word.startsWith("#")? word :`#${word}`),
+             //hashtags의 경우 새롭게 저장하기 전 실행해야 하는 함수임. 이러한 단계를 처리하기 위한 미들웨어가 존재함.
         })
         return res.redirect("/");
     } catch (error){

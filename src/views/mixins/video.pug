@@ -5,6 +5,9 @@ mixin video(info)
         
             p=info.description
             small=info.createAt
+            ul
+                each hashtag in info.hashtags
+                    li=hashtag
             hr
             //- 컨트롤러에서 보내준 videos가 info라는 인자로 들어와서 데이터를 뿌려줌. a태그로 이동해 줄 주소값에 id변수를 사용해 각 데이터를 하나씩 뿌려줌.
             //- Mixins은 데이터를 받을 수 있는 Partial이다
