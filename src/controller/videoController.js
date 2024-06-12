@@ -69,3 +69,23 @@ export const postUploadVideo = async(req, res) => {
     //try, catch문으로 에러가 일어났을 때 업로드페이지로 보내줌, 에러메세지 보여줌.
     
 };
+
+export const deleteVideo = async(req,res) => {
+    const {id} = req.params;
+    await Video.findOneAndDelete(id);
+    return res.redirect("/");
+}
+
+export const search = async(req, res) =>{
+    const {keyword} = req.query;
+    let videos = []
+    if(keyword){
+        videos = await Video.find({
+            title:{
+                $regex : new RegExp(keyword,"i"),
+            },
+        });
+    console.log(keyword);
+    }
+    return res.render("search",{pageTitle: "Search", videos});
+}
