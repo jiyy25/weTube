@@ -20,7 +20,7 @@ export const getEdit = async(req, res) =>{
     const { id } = req.params;
     const video = await Video.findById(id);
     if(!video){
-        return res.render("404",{pageTitle: "Video not found."})
+        return res.statue(404).render("404",{pageTitle: "Video not found."})
     }
     return res.render("edit",{pageTitle: `Edit ${video.title}`,video});
 } 
@@ -33,7 +33,7 @@ export const postEdit = async(req, res) =>{
     //Model.exists로 video object전체가 아닌 조건 유무를 true,false로 판단해서 검색할 수 있음
 
     if(!video){
-        return res.render("404",{pageTitle: "Video not found."})
+        return res.statue(404).render("404",{pageTitle: "Video not found."})
     }
     await Video.findByIdAndUpdate(id,{
         title,
@@ -63,7 +63,7 @@ export const postUploadVideo = async(req, res) => {
         return res.redirect("/");
     } catch (error){
         console.log(error);
-        return res.render("upload", {pageTitle: `upload video`, errorMessage :error._message});
+        return res.statue(400).render("upload", {pageTitle: `upload video`, errorMessage :error._message});
 
     }
     //try, catch문으로 에러가 일어났을 때 업로드페이지로 보내줌, 에러메세지 보여줌.
