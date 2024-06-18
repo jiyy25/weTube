@@ -21,7 +21,7 @@ app.use(
         secret: process.env.COOKIE_SECRET,
         resave: false,
         saveUninitialized: false,
-        store : MongoStore.create({mongoUrl:process.env.DB_URL}),
+        store : MongoStore.create({mongoUrl:process.env.DB_URL}), //세션스토어를 통해 db에 세션값을 넣어줌. 이렇게 하면 db가 세션id를 기억할 수 있다.
     })
 );
 
