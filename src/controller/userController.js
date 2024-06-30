@@ -154,8 +154,47 @@ export const getEdit = (req, res) => {
     return res.render("editUser", {pageTitle : "Edit Profile"});
 };
 
-export const postEdit = (req, res) => {
-    return res.render("editUser");
+export const postEdit = async(req, res) => {
+    const {
+        session :{
+            user:{_id, username:currentUserName, email: currentEmail},
+        },
+        body:{name, email, username, location},
+    } = req;
+
+    //username이 db에 이미 있다면?
+    const pageTitle = "Edit Profile";
+
+    if(username !== currentUserName){
+        const userNameExists = await User.exists({username});
+        if(userNameExists){
+            return res.status(400).render("editUser",{
+                pageTitle,
+                errorMessage : "사용자 이름이 이미 존재합니다.",
+            });
+        }
+    }
+
+    if(email !== currentEmail){
+        const userEmailExist = await User.exists({email});
+        if(userEmailExist){
+            return res.render("editUser",{
+                pageTitle,
+                errorMessage: "사용자 이메일이 이미 존재합니다."
+            })
+        }
+    }
+
+    const updateUser = await User.findByIdAndUpdate(_id, {
+        name,
+        email,
+        username,
+        location,
+    },
+    {new : true}, // 이걸 설정해주면 findByIdAndUpdate가 업데이트 된 데이터를 리턴해준다...!
+);
+    req.session.user = updateUser;
+    return res.redirect("/user/editUser");
 };
 
 export const remove = (req, res) => res.send("remove user");
