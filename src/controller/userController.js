@@ -157,10 +157,12 @@ export const getEdit = (req, res) => {
 export const postEdit = async(req, res) => {
     const {
         session :{
-            user:{_id, username:currentUserName, email: currentEmail},
+            user:{_id, username:currentUserName, email: currentEmail , avatarUrl},
         },
         body:{name, email, username, location},
+        file, //multer
     } = req;
+    console.log(file);
 
     //username이 db에 이미 있다면?
     const pageTitle = "Edit Profile";
@@ -186,6 +188,7 @@ export const postEdit = async(req, res) => {
     }
 
     const updateUser = await User.findByIdAndUpdate(_id, {
+        avatarUrl: file ? file.path : avatarUrl, //파일을 업로드 하지 않을때
         name,
         email,
         username,

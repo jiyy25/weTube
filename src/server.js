@@ -38,6 +38,7 @@ app.use(
 //     });
 
 app.use(localsMiddleware);
+app.use("/uploads", express.static("uploads")); //express.static: 폴더를 노출시킬수 있음-> static()에 노출시키고 싶은 폴더의 이름을 쓴다. 디렉토리 내부의 파일을 제공
 app.use("/", rootRouter);
 app.use("/user", userRouter);
 app.use("/videos", videoRouter);
